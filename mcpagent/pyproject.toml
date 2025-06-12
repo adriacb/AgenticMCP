@@ -1,0 +1,22 @@
+[project]
+name = "mcpagent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Adrià Cabello", email = "adrian.cabello@alumni.esci.upf.edu" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.12",
+    "langgraph>=0.4.8",
+    "mcp[cli]>=1.9.3",
+    "websockets>=15.0.1",
+]
+
+[project.scripts]
+mcpagent = "mcpagent:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
