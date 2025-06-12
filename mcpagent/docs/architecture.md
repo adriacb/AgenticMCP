@@ -20,20 +20,19 @@ The domain layer contains the core business rules and entities. It has no depend
 #### Structure
 ```
 domain/
-├── entities/
-│   └── mcp_session.py      # Concrete session implementation
-├── interfaces/
-│   ├── connection.py       # Connection types and configurations
-│   └── session.py         # Session interfaces
+├── entities/              # Core business objects
+├── interfaces/            # Abstract definitions
+├── value_objects/         # Immutable domain objects
+├── repositories/          # Repository interfaces
 └── __init__.py
 ```
 
 #### Key Components
 - **Connection Types**: Define different ways to connect to MCP servers
-  - `StdioConnection`
-  - `SSEConnection`
-  - `StreamableHttpConnection`
-  - `WebsocketConnection`
+  - `StdioConnection`: Standard I/O based connection
+  - `SSEConnection`: Server-Sent Events connection
+  - `StreamableHttpConnection`: HTTP streaming connection
+  - `WebsocketConnection`: WebSocket based connection
 - **Session Interface**: Defines the contract for MCP sessions
   - `Session`: Base interface
   - `StreamableSession`: Interface for streaming capability
@@ -72,25 +71,47 @@ The infrastructure layer contains implementations of the application layer inter
 #### Structure
 ```
 infrastructure/
-├── external/
-│   ├── mcp/
-│   │   ├── adapters/
-│   │   │   ├── tool_loader.py
-│   │   │   ├── prompt_loader.py
-│   │   │   ├── resource_loader.py
-│   │   │   └── session_factory.py
-│   │   ├── clients/
-│   │   │   ├── http_client.py
-│   │   │   └── websocket_client.py
-│   │   └── constants.py
-│   └── __init__.py
-└── __init__.py
+└── external/
+    └── mcp/
+        ├── base_session.py      # Base session implementation
+        ├── client.py            # MCP client implementation
+        ├── client_session.py    # Client session implementation
+        ├── constants.py         # Implementation constants
+        ├── session_factory.py   # Session factory implementation
+        ├── sse.py              # SSE connection implementation
+        ├── stdio.py            # Stdio connection implementation
+        ├── streamable_http.py   # Streamable HTTP implementation
+        └── websocket.py        # WebSocket connection implementation
 ```
 
 #### Key Components
-- **MCP Adapters**: Implementations of application layer interfaces
-- **HTTP Clients**: HTTP client implementations
-- **Constants**: Implementation-specific constants
+- **Session Implementations**:
+  - `BaseSession`: Common session functionality
+  - `ClientSession`: Client-side session implementation
+- **Connection Implementations**:
+  - `StreamableHttp`: HTTP streaming implementation
+  - `SSE`: Server-Sent Events implementation
+  - `Stdio`: Standard I/O implementation
+  - `Websocket`: WebSocket implementation
+- **Session Factory**: Creates appropriate session types based on connection configuration
+
+#### Streamable HTTP Implementation
+
+The Streamable HTTP implementation provides a robust way to handle streaming HTTP connections with the MCP server. Key features include:
+
+- **Protocol-based Design**: Uses Python's Protocol class for type-safe client factory definitions
+- **Lazy Loading**: Imports external dependencies (like `httpx`) only when needed
+- **Configurable Timeouts**: Default timeouts with ability to override:
+  - `DEFAULT_STREAMABLE_HTTP_TIMEOUT`: 30 seconds for HTTP operations
+  - `DEFAULT_STREAMABLE_HTTP_SSE_READ_TIMEOUT`: 5 minutes for SSE event reading
+- **Resource Management**: Proper cleanup of resources using async context managers
+- **Type Safety**: Comprehensive type hints with runtime import protection using `TYPE_CHECKING`
+
+The implementation is designed to be testable with:
+- Mockable HTTP client factory
+- Configurable timeouts and headers
+- Proper error handling for missing dependencies
+- Support for custom session parameters
 
 ### Presentation Layer
 

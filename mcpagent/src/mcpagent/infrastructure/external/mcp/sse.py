@@ -1,6 +1,6 @@
 from typing import Any, AsyncIterator, Optional, Protocol
 from contextlib import asynccontextmanager
-import httpx
+#from import httpx  # <-- REMOVE this import
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
@@ -11,9 +11,9 @@ class McpHttpClientFactory(Protocol):
     def __call__(
         self,
         headers: dict[str, str] | None = None,
-        timeout: httpx.Timeout | None = None,
-        auth: httpx.Auth | None = None,
-    ) -> httpx.AsyncClient: ...
+        timeout: Any = None,
+        auth: Any = None,
+    ) -> Any: ...
 
 @asynccontextmanager
 async def create_sse_session(
@@ -34,6 +34,8 @@ async def create_sse_session(
         session_kwargs: Additional keyword arguments to pass to the ClientSession
         httpx_client_factory: Custom factory for httpx.AsyncClient (optional)
     """
+    # Import httpx here for patching in tests
+    import httpx
     # Create and store the connection
     kwargs = {}
     if httpx_client_factory is not None:

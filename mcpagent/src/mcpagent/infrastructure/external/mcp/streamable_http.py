@@ -1,20 +1,22 @@
-from typing import Any, AsyncIterator, Optional, Protocol
+from typing import Any, AsyncIterator, Optional, Protocol, TYPE_CHECKING
 from contextlib import asynccontextmanager
 from datetime import timedelta
-import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
 DEFAULT_STREAMABLE_HTTP_TIMEOUT = timedelta(seconds=30)
 DEFAULT_STREAMABLE_HTTP_SSE_READ_TIMEOUT = timedelta(seconds=60 * 5)
 
+if TYPE_CHECKING:
+    import httpx
+
 class McpHttpClientFactory(Protocol):
     def __call__(
         self,
         headers: dict[str, str] | None = None,
-        timeout: httpx.Timeout | None = None,
-        auth: httpx.Auth | None = None,
-    ) -> httpx.AsyncClient: ...
+        timeout: "httpx.Timeout | None" = None,
+        auth: "httpx.Auth | None" = None,
+    ) -> "httpx.AsyncClient": ...
 
 @asynccontextmanager
 async def create_streamable_http_session(
@@ -25,7 +27,7 @@ async def create_streamable_http_session(
     terminate_on_close: bool = True,
     session_kwargs: Optional[dict[str, Any]] = None,
     httpx_client_factory: Optional[McpHttpClientFactory] = None,
-) -> AsyncIterator[ClientSession]:
+):
     """Create a new session to an MCP server using Streamable HTTP
 
     Args:
@@ -37,6 +39,8 @@ async def create_streamable_http_session(
         session_kwargs: Additional keyword arguments to pass to the ClientSession
         httpx_client_factory: Custom factory for httpx.AsyncClient (optional)
     """
+    # Import httpx here for patching in tests
+    import httpx
     # Create and store the connection
     kwargs = {}
     if httpx_client_factory is not None:

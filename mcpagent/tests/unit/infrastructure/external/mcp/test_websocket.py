@@ -2,9 +2,8 @@ import pytest
 from datetime import timedelta
 from unittest.mock import AsyncMock, patch, MagicMock
 import websockets
+from mcp.client.session import ClientSession as MCPClientSession
 from mcpagent.infrastructure.external.mcp.websocket import create_websocket_session
-from mcpagent.infrastructure.external.mcp.client_session import ClientSession
-from mcp import ClientSession as MCPClientSession
 
 @pytest.fixture
 def mock_websocket():
@@ -33,7 +32,7 @@ async def test_create_websocket_session(mock_websocket_client):
     url = "ws://example.com/ws"
     
     async with create_websocket_session(url=url) as session:
-        assert isinstance(session, ClientSession)
+        assert isinstance(session, MCPClientSession)
         mock_websocket_client.assert_called_once_with(url)
 
 @pytest.mark.asyncio
@@ -41,7 +40,7 @@ async def test_create_websocket_session_with_defaults(mock_websocket_client):
     url = "ws://example.com/ws"
     
     async with create_websocket_session(url=url) as session:
-        assert isinstance(session, ClientSession)
+        assert isinstance(session, MCPClientSession)
         mock_websocket_client.assert_called_once_with(url)
 
 @pytest.mark.asyncio
@@ -65,7 +64,7 @@ async def test_create_websocket_session_termination(mock_websocket_client):
     url = "ws://example.com/ws"
     
     async with create_websocket_session(url=url) as session:
-        assert isinstance(session, ClientSession)
+        assert isinstance(session, MCPClientSession)
         mock_websocket_client.assert_called_once_with(url)
 
 @pytest.mark.asyncio
@@ -73,5 +72,5 @@ async def test_create_websocket_session_no_termination(mock_websocket_client):
     url = "ws://example.com/ws"
     
     async with create_websocket_session(url=url) as session:
-        assert isinstance(session, ClientSession)
+        assert isinstance(session, MCPClientSession)
         mock_websocket_client.assert_called_once_with(url) 
