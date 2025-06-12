@@ -2,7 +2,7 @@
 Presentation layer package.
 """
 
-from .client.mcp_client import MultiServerMCPClient
+from ..infrastructure.external.mcp.client import MultiServerMCPClient
 
 __all__ = [
     "MultiServerMCPClient",

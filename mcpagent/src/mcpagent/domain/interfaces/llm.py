@@ -1,67 +1,63 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any, AsyncGenerator
-
-from langchain_core.messages import BaseMessage
+from typing import List, AsyncGenerator, Dict, Union
 
 
 class LLMInterface(ABC):
-    """Interface defining the contract for any LLM implementation.
+    """Interface for LLM clients.
     
-    This interface abstracts away the specific LLM provider (OpenAI, Anthropic, etc.)
-    and defines the core capabilities that any LLM must provide in our domain.
+    This interface defines the contract for both synchronous and asynchronous LLM clients.
+    Implementations should provide either synchronous or asynchronous methods, but not both.
     """
     
     @abstractmethod
-    async def generate(
-        self,
-        messages: List[BaseMessage],
-        temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
-        stop: Optional[List[str]] = None,
-        **kwargs: Any
-    ) -> BaseMessage:
-        """Generate a response based on the input messages.
+    def generate(self, prompt: str, instructions: str = "") -> str:
+        """Generate a response for a prompt using the responses API.
         
         Args:
-            messages: List of messages to generate a response for
-            temperature: Controls randomness in the output
-            max_tokens: Maximum number of tokens to generate
-            stop: List of strings that stop generation when encountered
-            **kwargs: Additional provider-specific parameters
+            prompt: The input prompt to generate a response for.
+            instructions: Optional instructions to guide the response generation.
             
         Returns:
-            The generated message
+            The generated response as a string.
         """
         pass
-    
+
     @abstractmethod
-    async def generate_stream(
-        self,
-        messages: List[BaseMessage],
-        temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
-        stop: Optional[List[str]] = None,
-        **kwargs: Any
-    ) -> AsyncGenerator[BaseMessage, None]:
-        """Generate a stream of responses based on the input messages.
+    async def agenerate(self, prompt: str, instructions: str = "") -> AsyncGenerator[str, None]:
+        """Asynchronously generate a response for a prompt using the responses API.
         
         Args:
-            messages: List of messages to generate a response for
-            temperature: Controls randomness in the output
-            max_tokens: Maximum number of tokens to generate
-            stop: List of strings that stop generation when encountered
-            **kwargs: Additional provider-specific parameters
+            prompt: The input prompt to generate a response for.
+            instructions: Optional instructions to guide the response generation.
             
-        Returns:
-            An async generator yielding message chunks
+        Yields:
+            Chunks of the generated response as they become available.
         """
         pass
-    
+
     @abstractmethod
-    def get_model_info(self) -> Dict[str, Any]:
-        """Get information about the LLM model being used.
+    def invoke(self, prompt: Union[str, List[Dict[str, str]]], stream: bool = False) -> Union[str, AsyncGenerator[str, None]]:
+        """Invoke the model with a prompt or message list.
         
+        Args:
+            prompt: Either a string prompt or a list of message dictionaries.
+            stream: Whether to stream the response.
+            
         Returns:
-            Dictionary containing model information (name, version, capabilities, etc.)
+            If stream is False, returns the complete response as a string.
+            If stream is True, returns an async generator that yields response chunks.
         """
-        pass 
+        pass
+
+    @abstractmethod
+    async def ainvoke(self, prompt: Union[str, List[Dict[str, str]]], stream: bool = True) -> AsyncGenerator[str, None]:
+        """Asynchronously invoke the model with a prompt or message list.
+        
+        Args:
+            prompt: Either a string prompt or a list of message dictionaries.
+            stream: Whether to stream the response (defaults to True for async).
+            
+        Yields:
+            Chunks of the generated response as they become available.
+        """
+        pass

@@ -2,8 +2,8 @@ from typing import Optional, Dict, Type, TypeVar
 from pathlib import Path
 from .base import BaseConfigModel
 from .fastapi_config import FastAPIConfigModel, FastAPIConfig
-from .openai_config import OpenAIConfigModel, OpenAIConfigImpl
-from .langfuse_config import LangfuseConfigModel, LangfuseConfigImpl
+from .openai_config import OpenAILLMConfig
+from .langfuse_config import LangfuseConfigModel
 from .paths import get_env_file_path, get_default_env_file_path
 from dotenv import load_dotenv
 
@@ -42,8 +42,8 @@ class ConfigManager:
         if config_type not in self._configs:
             if config_type == FastAPIConfigModel:
                 self._configs[config_type] = FastAPIConfigModel.from_env_file(self._env_file)
-            elif config_type == OpenAIConfigModel:
-                self._configs[config_type] = OpenAIConfigModel.from_env_file(self._env_file)
+            elif config_type == OpenAILLMConfig:
+                self._configs[config_type] = OpenAILLMConfig.from_env_file(self._env_file)
             elif config_type == LangfuseConfigModel:
                 self._configs[config_type] = LangfuseConfigModel.from_env_file(self._env_file)
             else:
@@ -60,20 +60,20 @@ class ConfigManager:
         config = self.get_config(FastAPIConfigModel)
         return FastAPIConfig(config)
     
-    def get_openai_config(self) -> OpenAIConfigImpl:
+    def get_openai_config(self) -> OpenAILLMConfig:
         """Get the OpenAI configuration.
         
         Returns:
-            OpenAIConfigImpl: The OpenAI configuration instance.
+            OpenAILLMConfig: The OpenAI configuration instance.
         """
-        config = self.get_config(OpenAIConfigModel)
-        return OpenAIConfigImpl(config)
+        config = self.get_config(OpenAILLMConfig)
+        return OpenAILLMConfig(config)
     
-    def get_langfuse_config(self) -> LangfuseConfigImpl:
+    def get_langfuse_config(self) -> LangfuseConfigModel:
         """Get the Langfuse configuration.
         
         Returns:
-            LangfuseConfigImpl: The Langfuse configuration instance.
+            LangfuseConfigModel: The Langfuse configuration instance.
         """
         config = self.get_config(LangfuseConfigModel)
-        return LangfuseConfigImpl(config) 
+        return LangfuseConfigModel(config) 

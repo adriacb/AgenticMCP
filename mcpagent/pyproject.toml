@@ -11,6 +11,7 @@ dependencies = [
     "fastapi>=0.115.12",
     "langgraph>=0.4.8",
     "mcp[cli]>=1.9.3",
+    "openai>=1.86.0",
     "websockets>=15.0.1",
 ]
 

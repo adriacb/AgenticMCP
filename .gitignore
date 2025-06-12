@@ -27,3 +27,4 @@ uv.lock
 .mypy_cache
 
 notebooks/
+mcpagent/config/

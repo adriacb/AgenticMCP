@@ -1,6 +1,6 @@
-from typing import Dict, Optional, List
-from pydantic import Field, BaseModel, field_validator
-from .base import LangfuseConfig, BaseConfigModel
+from typing import Optional, List
+from pydantic import Field, field_validator
+from .base import BaseConfigModel
 
 class LangfuseConfigModel(BaseConfigModel):
     """Pydantic model for Langfuse configuration."""
@@ -18,38 +18,3 @@ class LangfuseConfigModel(BaseConfigModel):
         if isinstance(v, str):
             return [tag.strip() for tag in v.split(',') if tag.strip()]
         return v
-
-class LangfuseConfigImpl(LangfuseConfig):
-    """Langfuse configuration implementation."""
-    
-    def __init__(self, config: LangfuseConfigModel):
-        """Initialize Langfuse configuration.
-        
-        Args:
-            config: LangfuseConfigModel instance containing the configuration.
-        """
-        self._config = config
-    
-    def get_public_key(self) -> str:
-        return self._config.public_key
-    
-    def get_secret_key(self) -> str:
-        return self._config.secret_key
-    
-    def get_host(self) -> str:
-        return self._config.host
-    
-    def get_timeout(self) -> Optional[int]:
-        return self._config.timeout
-    
-    def get_tags(self) -> List[str]:
-        return self._config.tags
-    
-    def get_version(self) -> str:
-        return self._config.version
-    
-    def get_release(self) -> str:
-        return self._config.release
-    
-    def get_environment(self) -> str:
-        return self._config.environment 

@@ -38,116 +38,15 @@ class BaseConfigModel(BaseSettings):
         
         return cls()
 
-class APIConfig(ABC):
-    """Base interface for API configuration."""
-    
-    @abstractmethod
-    def get_host(self) -> str:
-        """Get the host address."""
-        pass
 
-    @abstractmethod
-    def get_port(self) -> int:
-        """Get the port number."""
-        pass
+class APIConfig(BaseConfigModel):
+    """API configuration model."""
+    api_key: str
+    api_url: str
+    api_version: str
+    api_timeout: int
+    api_retries: int
+    api_retry_delay: int
 
-    @abstractmethod
-    def get_workers(self) -> int:
-        """Get the number of workers."""
-        pass
-
-    @abstractmethod
-    def get_reload(self) -> bool:
-        """Get whether to reload on changes."""
-        pass
-
-    @abstractmethod
-    def get_access_log(self) -> bool:
-        """Get whether to enable access logging."""
-        pass
-
-    @abstractmethod
-    def get_api_prefix(self) -> str:
-        """Get the API prefix."""
-        pass
-
-    @abstractmethod
-    def get_api_title(self) -> str:
-        """Get the API title."""
-        pass
-
-    @abstractmethod
-    def get_api_description(self) -> str:
-        """Get the API description."""
-        pass
-
-    @abstractmethod
-    def get_api_version(self) -> str:
-        """Get the API version."""
-        pass
-
-class OpenAIConfig(ABC):
-    """Base interface for OpenAI configuration."""
-    
-    @abstractmethod
-    def get_api_key(self) -> str:
-        """Get the OpenAI API key."""
-        pass
-
-    @abstractmethod
-    def get_model(self) -> str:
-        """Get the OpenAI model name."""
-        pass
-
-    @abstractmethod
-    def get_temperature(self) -> float:
-        """Get the temperature setting."""
-        pass
-
-    @abstractmethod
-    def get_max_tokens(self) -> Optional[int]:
-        """Get the maximum number of tokens."""
-        pass
-
-class LangfuseConfig(ABC):
-    """Base interface for Langfuse configuration."""
-    
-    @abstractmethod
-    def get_public_key(self) -> str:
-        """Get the Langfuse public key."""
-        pass
-
-    @abstractmethod
-    def get_secret_key(self) -> str:
-        """Get the Langfuse secret key."""
-        pass
-
-    @abstractmethod
-    def get_host(self) -> str:
-        """Get the Langfuse host."""
-        pass
-
-    @abstractmethod
-    def get_timeout(self) -> Optional[int]:
-        """Get the timeout setting."""
-        pass
-
-    @abstractmethod
-    def get_tags(self) -> Dict[str, str]:
-        """Get the Langfuse tags."""
-        pass
-
-    @abstractmethod
-    def get_version(self) -> str:
-        """Get the Langfuse version."""
-        pass
-
-    @abstractmethod
-    def get_release(self) -> str:
-        """Get the Langfuse release."""
-        pass
-
-    @abstractmethod
-    def get_environment(self) -> str:
-        """Get the Langfuse environment."""
-        pass 
+    def to_dict(self) -> dict:
+        return self.model_dump()
