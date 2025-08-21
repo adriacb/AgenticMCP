@@ -1,181 +1,116 @@
-# AgenticMCP Architecture
+# MCPAgent Architecture
 
-This document outlines the architecture of the AgenticMCP project, following clean architecture principles.
+## Project Structure
+```
+src/mcpagent/
+├── core/                      # Core domain and business logic
+│   ├── application/          # Application services and use cases
+│   │   ├── commands/        # Command handlers
+│   │   ├── dto/            # Data Transfer Objects
+│   │   ├── queries/        # Query handlers
+│   │   └── use_cases/      # Business use cases
+│   ├── domain/              # Domain model
+│   │   ├── entities/       # Domain entities
+│   │   ├── interfaces/     # Abstract interfaces
+│   │   └── value_objects/  # Value objects
+│   └── exceptions/          # Domain exceptions
+├── infrastructure/           # External implementations and tools
+│   ├── agents/             # Agent implementations
+│   ├── config/             # Configuration management
+│   ├── llm/               # LLM service implementations
+│   ├── logger/            # Logging infrastructure
+│   ├── monitoring/        # Monitoring tools (Grafana, Langfuse)
+│   ├── prompts/           # Prompt management
+│   ├── storage/           # Storage implementations
+│   ├── tools/             # Tool implementations
+│   └── workflows/         # LangGraph workflow implementations
+└── presentation/            # User interface layer
+    ├── api/               # FastAPI implementation
+    └── cli/               # Command Line Interface
+```
 
-## Overview
+## Architecture Overview
 
-The project is organized into four main layers:
+The MCPAgent follows a Clean Architecture pattern with four main layers:
 
-1. **Domain Layer**: Core business rules and entities
-2. **Application Layer**: Use cases and their interfaces
-3. **Infrastructure Layer**: External implementations and adapters
-4. **Presentation Layer**: User-facing interfaces
+1. **Core Layer** (Domain & Application)
+   - Contains business logic and rules
+   - Defines interfaces and entities
+   - Independent of external frameworks
 
-## Layer Details
+2. **Infrastructure Layer**
+   - Implements interfaces defined in core
+   - Handles external services and tools
+   - Manages technical concerns
+
+3. **Presentation Layer**
+   - Provides API and CLI interfaces
+   - Handles HTTP routes and controllers
+   - Manages user interaction
+
+4. **Workflows Layer**
+   - Implements LangGraph-based workflows
+   - Orchestrates agent interactions
+   - Manages state and transitions
+
+## Component Interaction
+
+```mermaid
+graph TD
+    subgraph Presentation
+        API[FastAPI Routes]
+        CLI[Command Line]
+    end
+
+    subgraph Core
+        Domain[Domain Layer]
+        Application[Application Layer]
+        UseCase[Use Cases]
+    end
+
+    subgraph Infrastructure
+        Config[Configuration]
+        Logger[Logging]
+        Monitoring[Monitoring]
+        Storage[Storage]
+        LLM[LLM Services]
+        Workflows[LangGraph Workflows]
+    end
+
+    API --> UseCase
+    CLI --> UseCase
+    UseCase --> Domain
+    UseCase --> Application
+    Application --> Infrastructure
+    
+    Infrastructure --> |External Services| LLM
+    Infrastructure --> |Persistence| Storage
+    Infrastructure --> |Telemetry| Monitoring
+
+    style Domain fill:#f9f,stroke:#333
+    style Infrastructure fill:#bbf,stroke:#333
+    style Presentation fill:#bfb,stroke:#333
+```
+
+## Key Components
 
 ### Domain Layer
-
-The domain layer contains the core business rules and entities. It has no dependencies on other layers.
-
-#### Structure
-```
-domain/
-├── entities/              # Core business objects
-├── interfaces/            # Abstract definitions
-├── value_objects/         # Immutable domain objects
-├── repositories/          # Repository interfaces
-└── __init__.py
-```
-
-#### Key Components
-- **Connection Types**: Define different ways to connect to MCP servers
-  - `StdioConnection`: Standard I/O based connection
-  - `SSEConnection`: Server-Sent Events connection
-  - `StreamableHttpConnection`: HTTP streaming connection
-  - `WebsocketConnection`: WebSocket based connection
-- **Session Interface**: Defines the contract for MCP sessions
-  - `Session`: Base interface
-  - `StreamableSession`: Interface for streaming capability
-  - `SessionFactory`: Protocol for creating sessions
-
-### Application Layer
-
-The application layer contains use cases and their interfaces. It depends only on the domain layer.
-
-#### Structure
-```
-application/
-├── interfaces/
-│   ├── tool_loader.py      # Interface for loading tools
-│   ├── prompt_loader.py    # Interface for loading prompts
-│   ├── resource_loader.py  # Interface for loading resources
-│   └── session_manager.py  # Interface for managing sessions
-├── use_cases/
-│   ├── tools/
-│   ├── prompts/
-│   ├── resources/
-│   └── sessions/
-└── __init__.py
-```
-
-#### Key Components
-- **Tool Loading**: Interface for loading tools from MCP sessions
-- **Prompt Loading**: Interface for loading prompts from MCP sessions
-- **Resource Loading**: Interface for loading resources from MCP sessions
-- **Session Management**: Interface for managing MCP sessions
+- Defines core business entities (Agent, Context, LLM, Message, etc.)
+- Contains business rules and logic
+- Provides interfaces for infrastructure implementations
 
 ### Infrastructure Layer
-
-The infrastructure layer contains implementations of the application layer interfaces and external dependencies.
-
-#### Structure
-```
-infrastructure/
-└── external/
-    └── mcp/
-        ├── base_session.py      # Base session implementation
-        ├── client.py            # MCP client implementation
-        ├── client_session.py    # Client session implementation
-        ├── constants.py         # Implementation constants
-        ├── session_factory.py   # Session factory implementation
-        ├── sse.py              # SSE connection implementation
-        ├── stdio.py            # Stdio connection implementation
-        ├── streamable_http.py   # Streamable HTTP implementation
-        └── websocket.py        # WebSocket connection implementation
-```
-
-#### Key Components
-- **Session Implementations**:
-  - `BaseSession`: Common session functionality
-  - `ClientSession`: Client-side session implementation
-- **Connection Implementations**:
-  - `StreamableHttp`: HTTP streaming implementation
-  - `SSE`: Server-Sent Events implementation
-  - `Stdio`: Standard I/O implementation
-  - `Websocket`: WebSocket implementation
-- **Session Factory**: Creates appropriate session types based on connection configuration
-
-#### Streamable HTTP Implementation
-
-The Streamable HTTP implementation provides a robust way to handle streaming HTTP connections with the MCP server. Key features include:
-
-- **Protocol-based Design**: Uses Python's Protocol class for type-safe client factory definitions
-- **Lazy Loading**: Imports external dependencies (like `httpx`) only when needed
-- **Configurable Timeouts**: Default timeouts with ability to override:
-  - `DEFAULT_STREAMABLE_HTTP_TIMEOUT`: 30 seconds for HTTP operations
-  - `DEFAULT_STREAMABLE_HTTP_SSE_READ_TIMEOUT`: 5 minutes for SSE event reading
-- **Resource Management**: Proper cleanup of resources using async context managers
-- **Type Safety**: Comprehensive type hints with runtime import protection using `TYPE_CHECKING`
-
-The implementation is designed to be testable with:
-- Mockable HTTP client factory
-- Configurable timeouts and headers
-- Proper error handling for missing dependencies
-- Support for custom session parameters
+- Implements external service integrations
+- Manages configuration and logging
+- Handles storage and monitoring
+- Implements LangGraph workflow orchestration
 
 ### Presentation Layer
+- FastAPI implementation for HTTP endpoints
+- CLI interface for command-line interactions
+- Error handling and middleware
 
-The presentation layer provides the user-facing interface. It depends on the application layer.
-
-#### Structure
-```
-presentation/
-├── client/
-│   ├── mcp_client.py      # High-level client API
-│   └── __init__.py
-└── __init__.py
-```
-
-#### Key Components
-- **MultiServerMCPClient**: Main client class for users to interact with MCP servers
-
-## Design Principles
-
-1. **Dependency Rule**: Dependencies point inward. Outer layers depend on inner layers, not vice versa.
-2. **Interface Segregation**: Each layer defines clear interfaces for its functionality.
-3. **Single Responsibility**: Each component has a single, well-defined responsibility.
-4. **Dependency Inversion**: High-level modules don't depend on low-level modules. Both depend on abstractions.
-
-## Usage Example
-
-```python
-from mcpagent import MultiServerMCPClient
-
-# Create a client with server connections
-client = MultiServerMCPClient({
-    "math": {
-        "command": "python",
-        "args": ["/path/to/math_server.py"],
-        "transport": "stdio",
-    },
-    "weather": {
-        "url": "http://localhost:8000/mcp",
-        "transport": "streamable_http",
-    }
-})
-
-# Get tools from all servers
-all_tools = await client.get_tools()
-
-# Get tools from a specific server
-math_tools = await client.get_tools(server_name="math")
-
-# Get a prompt
-prompt = await client.get_prompt("math", "calculator", arguments={"operation": "add"})
-
-# Get resources
-resources = await client.get_resources("weather", uris=["forecast.json"])
-
-# Use a session directly
-async with client.session("math") as session:
-    # Do something with the session
-    pass
-```
-
-## Future Improvements
-
-1. **Infrastructure Implementation**: Complete the infrastructure layer implementations
-2. **Error Handling**: Add comprehensive error handling and recovery
-3. **Testing**: Add unit and integration tests for each layer
-4. **Documentation**: Add more detailed documentation for each component
-5. **Monitoring**: Add logging and monitoring capabilities 
+### Workflow Components
+- LangGraph-based workflow orchestration
+- React pattern implementation
+- State management and transitions

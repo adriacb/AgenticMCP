@@ -7,7 +7,7 @@ from mcpagent.domain.interfaces.prompt_repository import PromptRepository
 logger = LoggerInitializer.get_default_logger()
 
 
-class LangfusePromptRepository(PromptRepository):
+class LangfusePromptRepository(PromptRegistry):
     def __init__(self, config: LangfuseConfig):
         try:
             self.langfuse = Langfuse(
