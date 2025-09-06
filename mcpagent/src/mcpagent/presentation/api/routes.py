@@ -4,10 +4,9 @@ from pydantic import BaseModel
 from typing import List, Any
 from langchain_core.messages import HumanMessage
 
-from mcpagent.application.services.logger import LoggerInitializer
-from mcpagent.application.use_cases.langgraph import stream_response
 
-logger = LoggerInitializer.get_default_logger()
+#from mcpagent.application.use_cases.langgraph import stream_response
+
 router = APIRouter()
 
 def register_routes(app: FastAPI):
@@ -30,17 +29,17 @@ async def generate_stream_endpoint(request: MessageRequest):
     """
     try:
         return StreamingResponse(
-            stream_response(
-                graph=router.app.state.graph,
-                query=request.messages,
-                thread_id=request.user_id,
-                callbacks=[router.app.state.langfuse_handler],
-                ), 
-            headers={"Content-Type": "text/event-stream"},
-            media_type="text/event-stream",
+            # stream_response(
+            #     graph=router.app.state.graph,
+            #     query=request.messages,
+            #     thread_id=request.user_id,
+            #     callbacks=[router.app.state.langfuse_handler],
+            #     ), 
+            # headers={"Content-Type": "text/event-stream"},
+            # media_type="text/event-stream",
             )
     except Exception as e:
-        logger.error(f"Error generating stream response: {e}")
+        app.state.logger.error(f"Error generating stream response: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.websocket("/ws")
@@ -52,8 +51,8 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_json()
             messages = [HumanMessage(content=msg) for msg in data.get("messages", [])]
-            async for event in stream_response(messages):
-                await websocket.send_json(event)
+            # async for event in stream_response(messages):
+            #     await websocket.send_json(event)
     except Exception as e:
         await websocket.send_json({"error": str(e)})
     finally:

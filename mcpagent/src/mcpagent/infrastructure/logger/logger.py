@@ -15,6 +15,7 @@ class LoggerConfig:
     cache_logger_on_first_use: bool = True
     logger_factory: Optional[Any] = None
     additional_processors: Optional[List[Any]] = None
+    log_file: Optional[str] = None  # <-- add this
 
     def get_processors(self) -> List[Any]:
         """Get the list of processors based on configuration."""
@@ -44,22 +45,26 @@ class LoggerInitializer:
     
     @staticmethod
     def initialize(config: LoggerConfig) -> structlog.BoundLogger:
-        """Initialize and configure structlog logger with the given configuration."""
-        # Ensure root logger and handlers use the requested level.
         level_name = str(config.level).upper()
         level = getattr(logging, level_name, logging.INFO)
         root = logging.getLogger()
-        # add a default StreamHandler only if no handlers exist
-        if not root.handlers:
+        
+        # Clear existing handlers (optional, ensures re-initialization is clean)
+        if root.handlers:
+            root.handlers.clear()
+        
+        # Add StreamHandler only if no log_file is set
+        if config.log_file:
+            handler = logging.FileHandler(config.log_file)
+        else:
             handler = logging.StreamHandler(sys.stdout)
-            handler.setFormatter(logging.Formatter("%(message)s"))
-            root.addHandler(handler)
-        # set level on root and all handlers (forces update on re-init)
+        
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        root.addHandler(handler)
         root.setLevel(level)
         for h in root.handlers:
             h.setLevel(level)
 
-        # Configure structlog
         structlog.configure(
             processors=config.get_processors(),
             wrapper_class=config.wrapper_class or structlog.stdlib.BoundLogger,
@@ -67,10 +72,7 @@ class LoggerInitializer:
             logger_factory=config.logger_factory or structlog.stdlib.LoggerFactory(),
         )
 
-        # Clear any existing context
         structlog.contextvars.clear_contextvars()
-
-        # Get the logger
         return structlog.get_logger()
 
     @staticmethod

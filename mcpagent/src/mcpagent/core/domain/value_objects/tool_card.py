@@ -10,7 +10,7 @@ class ToolCard(BaseModel):
     parameters: Dict[str, Any] = Field(default_factory=dict)
     function: Callable[..., Any]
     args_schema: Any = None  # Schema for the arguments, can be a Pydantic model or similar
-
+    strict: bool = True
     # allow callables / other arbitrary runtime types if needed
     model_config = {"arbitrary_types_allowed": True}
 

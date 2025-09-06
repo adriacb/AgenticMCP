@@ -1,14 +1,14 @@
 from langfuse import Langfuse
 
-from mcpagent.application.services.config.langfuse_config import LangfuseConfig
-from mcpagent.application.services.logger import LoggerInitializer
-from mcpagent.domain.interfaces.prompt_repository import PromptRepository
+from mcpagent.infrastructure.config import LangfuseConfigModel
+from mcpagent.infrastructure.logger import LoggerInitializer
+from mcpagent.core.domain.interfaces import PromptRegistryInterface
 
 logger = LoggerInitializer.get_default_logger()
 
 
-class LangfusePromptRepository(PromptRegistry):
-    def __init__(self, config: LangfuseConfig):
+class LangfusePromptRepository(PromptRegistryInterface):
+    def __init__(self, config: LangfuseConfigModel):
         try:
             self.langfuse = Langfuse(
                 public_key=config.langfuse_public_key,

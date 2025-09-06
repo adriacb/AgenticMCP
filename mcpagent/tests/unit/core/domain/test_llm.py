@@ -43,6 +43,8 @@ def test_llm_with_tool_registry(dummy_llm_config, dummy_tool_registry, monkeypat
             return self
 
     monkeypatch.setattr(ChatLLM, "_initialize_llm", lambda self: DummyModel())
-    llm = ChatLLM(llm_config=dummy_llm_config, tool_registry=dummy_tool_registry)
+    # Construct a list of tools from the dummy registry (empty list here)
+    tools = list(dummy_tool_registry.list())
+    llm = ChatLLM(llm_config=dummy_llm_config, tools=tools)
     assert isinstance(llm.llm, DummyModel)
-    assert llm.tool_registry is dummy_tool_registry
+    assert llm.tools is tools

@@ -6,4 +6,4 @@ from .agent_card import AgentCard
 class AgentConfig(BaseModel):
     llm_config: LLMConfig
     agent_card: AgentCard = AgentCard()
-    system_prompt: Any = "You are a helpful assistant."
+    system_prompt: str = "You are a helpful assistant."

@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  mcpagent:
+    # Build locally from the repository Dockerfile (no registry push)
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcpagent:local
+    container_name: mcpagent_local
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    environment:
+      # Keep logs unbuffered for immediate container logs
+      PYTHONUNBUFFERED: '1'
+    # Uncomment the volume below for development mounts (hot-reload)
+    # Note: mounting the source will hide the installed wheel from the image.
+    # volumes:
+    #   - ./mcpagent:/app/mcpagent:delegated
+    # Add any env file if needed
+    # env_file:
+    #   - .env
+
+  # Example: add supporting services here (databases, vector dbs, etc.)
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+
+networks:
+  default:
+    name: mcpagent_network

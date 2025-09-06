@@ -1,15 +1,15 @@
-import os
-from mcpagent.presentation.api.app import app
-from mcpagent.application.use_cases import GetConfigUseCase
+from mcpagent.src.mcpagent.presentation.api.app import app
+from mcpagent.infrastructure.config.settings import load_settings
 
-
-config = GetConfigUseCase(env="development")
-
+FASTAGENT_ENV = "dev"
 
 if __name__ == "__main__":
     import uvicorn
 
-    if os.getenv("FASTAGENT_ENV") == "development":
-        uvicorn.run(app, host=os.getenv("FASTAGENT_API_HOST"), port=os.getenv("FASTAGENT_API_PORT"))
-    else:
-        uvicorn.run(app, host=os.getenv("FASTAGENT_API_HOST"), port=os.getenv("FASTAGENT_API_PORT"), reload=False)
+    settings = load_settings(FASTAGENT_ENV)
+    uvicorn.run(
+            app, 
+            host=settings.FASTAGENT_API_HOST, 
+            port=settings.FASTAGENT_API_PORT, 
+            reload=settings.FASTAGENT_API_RELOAD
+        )

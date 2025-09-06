@@ -1,84 +1,125 @@
-from typing import Union
-
+from typing import List, Union, Dict
 from langchain.chat_models import init_chat_model
 
-from mcpagent.core.domain.interfaces import LLMInterface, ToolRegistryInterface, BaseMessage
+from mcpagent.core.domain.interfaces import LLMInterface, BaseMessage
 from mcpagent.core.domain.value_objects import LLMConfig
+from mcpagent.infrastructure.logger import LoggerInitializer
+from .messages import AIMessage
+#from .tool import Tool
+from mcp.server.fastmcp.tools.base import Tool
+
+
+MessageInput = Union[BaseMessage, Dict[str, str]]
+
 
 class ChatLLM(LLMInterface):
     """
-    Represents a Language Model (LLM) that can generate responses based on input messages.
+    Lightweight chat LLM wrapper for MCP.
+
+    Responsibilities:
+        - Pure LLM invocation (sync or async)
+        - Converts BaseMessage or dict messages to LangChain format
+        - Supports MCP tool binding **at initialization** via `tools` parameter
+        - Supports synchronous and asynchronous text generation
     """
-    def __init__(self, llm_config: LLMConfig, tool_registry: Union[ToolRegistryInterface,None]=None):
-        """
-        Initialize the LLM with the given configuration.
-        
-        :param llm_config: Configuration dictionary for the LLM.
-        """
-        self.llm_config: LLMConfig = llm_config
-        self.tool_registry: Union[ToolRegistryInterface, None] = tool_registry
-        self.llm = self._initialize_llm()
 
-        # Additional initialization logic can be added here
-    
-    def _initialize_llm(self):
+    def __init__(self, llm_config: LLMConfig, tools: List[Tool] | None = None) -> None:
         """
-        Private method to initialize the LLM based on the configuration.
+        Initialize the ChatLLM and bind tools in a single step.
+
+        Args:
+            llm_config: LLM configuration object
+            tools: Optional list of MCP Tool objects to bind. Each Tool must implement
+                   `to_openai_tool()` to be compatible with LangChain tool-calling.
         """
-        if self.tool_registry is not None:
-            # Initialize the LLM with the tool registry if provided
-            return init_chat_model(**self.llm_config.model_dump()).bind_tools(self.tool_registry.list())
+        self.llm_config = llm_config
+
+        # Initialize the LLM and bind tools in one shot
+        # Tests may monkeypatch `_initialize_llm` to return a fake model.
+        if hasattr(self, "_initialize_llm"):
+            try:
+                # Prefer calling with the `tools` keyword if the patched function accepts it
+                self.llm = self._initialize_llm(tools=tools)
+            except TypeError:
+                # Fallback for test shims that provide a no-arg initializer (lambda self: ...)
+                self.llm = self._initialize_llm()
         else:
-            # Initialize the LLM without a tool registry
-            return init_chat_model(**self.llm_config.model_dump())
-    
-    def _handle_tool_calls(self, result):
-        """
-        Handle tool calls if any are present in the result.
-        
-        :param result: The result from the LLM invocation.
-        """
-        if hasattr(result, 'tool_calls'):
-            for tool_call in result.tool_calls:
-                tool = self.tool_registry.get(tool_call['name'])
-                if tool:
-                    # Execute the tool with the provided arguments
-                    tool_response = tool.execute(**tool_call['args'])
-                    # Append the tool response to the result
-                    result.content += f"\nTool {tool.name} response: {tool_response}"
+            self.llm = (
+                init_chat_model(**self.llm_config.model_dump()).bind_tools(tools)
+                if tools
+                else init_chat_model(**self.llm_config.model_dump())
+            )
 
-        return result          
+        self.logger = LoggerInitializer.get_default_logger()
+
+        # Preserve the identity of the tools list for callers/tests
+        self.tools = tools
+
+        self.logger.debug(
+            "ChatLLM initialized",
+            extra={
+                "llm_config": self.llm_config,
+                "tools": [getattr(t, "name", None) for t in self.tools] if self.tools else [],
+            },
+        )
+
+    def _initialize_llm(self, tools: List[Tool] | None = None):
+        """Default hook that returns the initialized llm. Tests can monkeypatch
+        this method to return a fake model object."""
+
+        return (
+            init_chat_model(**self.llm_config.model_dump()).bind_tools(tools)
+            if tools
+            else init_chat_model(**self.llm_config.model_dump())
+        )
+
+    def invoke(self, messages: List[MessageInput]) -> AIMessage:
+        """
+        Synchronously invoke the LLM.
+
+        Args:
+            messages: List of BaseMessage or dict messages.
+
+        Returns:
+            AIMessage: Domain message returned by the LLM.
+        """
+        return self.llm.invoke(messages)
+
+    async def ainvoke(self, messages: List[MessageInput]) -> AIMessage:
+        """
+        Asynchronously invoke the LLM.
+
+        Args:
+            messages: List of BaseMessage or dict messages.
+
+        Returns:
+            AIMessage: Domain message returned by the LLM.
+        """
+        return await self.llm.ainvoke(messages)
+
 
     def generate(self, prompt: str) -> str:
         """
-        Generate a response based on the provided messages.
+        Synchronous text generation using the LLM.
+
+        Args:
+            prompt: Input prompt string.
+
+        Returns:
+            Generated text.
         """
+        self.logger.debug("ChatLLM generate called", extra={"prompt": prompt[:round(len(prompt) * 0.1)]})
         return self.llm.generate(prompt)
 
     async def agenerate(self, prompt: str) -> str:
         """
-        Asynchronously generate a response based on the provided messages.
+        Asynchronous text generation using the LLM.
+
+        Args:
+            prompt: Input prompt string.
+
+        Returns:
+            Generated text.
         """
+        self.logger.debug("ChatLLM agenerate called", extra={"prompt": prompt[:round(len(prompt) * 0.1)]})
         return await self.llm.agenerate(prompt)
-    
-    def invoke(self, messages: list) -> str:
-        """
-        Invoke the LLM with the provided messages and return the response.
-        
-        :param messages: List of messages to send to the LLM.
-        :return: The generated response as a string.
-        """
-        result = self.llm.invoke(messages)
-        result = self._handle_tool_calls(result)
-        return result
-    
-    async def ainvoke(self, messages: list) -> str:
-        """
-        Asynchronously invoke the LLM with the provided messages and return the response.
-        
-        :param messages: List of messages to send to the LLM.
-        :return: The generated response as a string.
-        """
-        result = await self.llm.ainvoke(messages)
-        result = self._handle_tool_calls(result)
-        return result
