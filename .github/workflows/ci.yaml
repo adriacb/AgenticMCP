@@ -6,13 +6,12 @@ on:
   pull_request:
     branches: [development, main]
 
-defaults:
-  run:
-    working-directory: ./AgenticMCP
-
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
 
     steps:
       - name: Checkout
@@ -26,32 +25,30 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      # Ensure dependencies are installed in the uv-managed environment
       - name: Sync dependencies from pyproject.toml
         run: uv sync
 
-      # ✅ Install the project into the same uv environment in editable mode
       - name: Install project in editable mode
-        run: uv run pip install -e .
+        run: uv run pip install -e ./AgenticMCP
 
       - name: Lint with ruff
-        run: uv run ruff check .
+        run: uv run ruff check ./AgenticMCP
 
-      # ✅ Run pytest from repo root so imports resolve correctly
       - name: Run tests with coverage
         run: |
-          uv run pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/AgenticMCP
+          uv run pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml ./AgenticMCP
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-xml
-          path: coverage.xml
+          path: AgenticMCP/coverage.xml
 
       - name: Send coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: coverage.xml
+          files: AgenticMCP/coverage.xml
           fail_ci_if_error: true
 
   build-and-push:
