@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
     branches: [ development, main ]
@@ -17,21 +18,21 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Upgrade pip and install build tools
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
+      - name: Install uv
+        run: pip install uv
 
-      - name: Install package and dev tools
-        run: |
-          # prefer editable install when available, fall back to plain install
-          python -m pip install -e . || python -m pip install .
-          python -m pip install ruff pytest pytest-cov codecov
+      - name: Sync dependencies from pyproject.toml
+        run: uv sync
+
+      - name: Install project in editable mode
+        run: uv pip install -e .
 
       - name: Lint with ruff
         run: ruff check .
 
       - name: Run tests with coverage
-        run: pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
+        run: |
+          PYTHONPATH=$(pwd) pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -57,4 +58,4 @@ jobs:
         run: |
           docker build -t myorg/mcpagent:latest .
 
-      # Optionally add push steps here (requires registry credentials)
+      # Optionally add Docker push step here
