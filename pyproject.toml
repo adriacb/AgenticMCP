@@ -30,3 +30,6 @@ members = ["mcpagent"]
 
 [tool.setuptools]
 packages = ["mcpagent"]
+
+[tool.ruff]
+ignore = ["F841", "F811", "F821", "F401"]  # Example: ignore unused imports and line length
