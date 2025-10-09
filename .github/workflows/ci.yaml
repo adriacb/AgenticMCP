@@ -24,12 +24,12 @@ jobs:
 
       # ✅ Point uv to the correct pyproject.toml in mcpagent/
       - name: Sync dependencies from pyproject.toml
-        run: uv sync --project mcpagent
+        run: uv sync
         working-directory: mcpagent
 
       # ✅ Install the project (editable mode) using src layout
       - name: Install project in editable mode
-        run: uv run pip install -e mcpagent
+        run: uv run pip install -e .
         working-directory: mcpagent
 
       - name: Lint with ruff
