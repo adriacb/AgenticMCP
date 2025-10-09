@@ -48,8 +48,8 @@ jobs:
           name: coverage-xml
           path: mcpagent/coverage.xml
 
-      - name: Send coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: mcpagent/coverage.xml
-          fail_ci_if_error: true
+      # - name: Send coverage to Codecov
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     files: mcpagent/coverage.xml
+      #     fail_ci_if_error: true
