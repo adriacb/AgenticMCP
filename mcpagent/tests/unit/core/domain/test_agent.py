@@ -1,5 +1,4 @@
 import pytest
-from types import SimpleNamespace
 
 from mcpagent.core.domain.value_objects import AgentConfig, LLMConfig, AgentCard
 from mcpagent.core.domain.entities import Agent

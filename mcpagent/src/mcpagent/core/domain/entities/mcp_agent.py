@@ -2,7 +2,7 @@ from typing import List
 from mcpagent.core.domain.value_objects import AgentConfig
 from mcpagent.core.domain.interfaces import BaseMessage, AgentInterface
 from mcpagent.core.application.dto import ToolMessage
-from mcpagent.src.mcpagent.infrastructure import logger
+#from mcpagent.src.mcpagent.infrastructure import logger
 
 # We'll construct our framework-agnostic ToolMessage DTO for clarity, but
 # convert it to a plain dict with `to_dict()` before appending so LangChain
@@ -10,7 +10,7 @@ from mcpagent.src.mcpagent.infrastructure import logger
 from .messages import AIMessage
 from .llm import ChatLLM
 from fastmcp.tools import Tool
-from fastmcp import Client
+#from fastmcp import Client
 from mcp import ClientSession
 from mcpagent.infrastructure.logger import LoggerInitializer
 
@@ -49,7 +49,7 @@ class MCPAgent(AgentInterface):
         return cls(config, session, tools)
 
     def format_prompt(self, messages: list) -> None:
-        jsonified_tools = [tool.model_dump() for tool in self.tools]
+        #jsonified_tools = [tool.model_dump() for tool in self.tools]
         tool_names = [tool.name for tool in self.tools]
 
         return self.config.system_prompt.format(

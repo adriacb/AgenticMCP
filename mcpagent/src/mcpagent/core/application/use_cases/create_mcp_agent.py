@@ -1,4 +1,3 @@
-from typing import Optional
 from fastmcp import Client
 from mcpagent.core.domain.value_objects import AgentConfig
 from mcpagent.core.domain.entities import MCPAgent

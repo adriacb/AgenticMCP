@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List, Any, Union
 from .llm_config import LLMConfig
 from .agent_card import AgentCard
 

@@ -2,20 +2,16 @@ from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
 from mcpagent.application.services.logger import LoggerInitializer
 from langchain_mongodb.index import create_fulltext_search_index
 
-logger = LoggerInitializer.get_default_logger()
-
-
 from typing import Generic, Type, TypeVar
-
 from bson import ObjectId
 from loguru import logger
 from pydantic import BaseModel
 from pymongo import MongoClient, errors
 
-from philoagents.config import settings
+from mcpagent.config import settings
 
 T = TypeVar("T", bound=BaseModel)
-
+logger = LoggerInitializer.get_default_logger()
 
 class MongoClientWrapper(Generic[T]):
     """Service class for MongoDB operations, supporting ingestion, querying, and validation.

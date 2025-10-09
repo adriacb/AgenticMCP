@@ -1,10 +1,8 @@
 from mcpagent.core.domain.interfaces import ToolRegistryInterface
-from langchain_core.tools import StructuredTool
 from inspect import signature
 from pydantic import BaseModel, create_model, Field
 from .tool import Tool
 from typing import Dict, Optional
-from langchain_core.utils.function_calling import convert_to_openai_tool
 
 
 def infer_args_schema(func) -> type[BaseModel]:

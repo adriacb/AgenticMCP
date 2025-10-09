@@ -52,15 +52,15 @@ class InMemoryPromptRepository(PromptRegistryInterface):
             self.registry[prompt_id] = prompt
             return prompt_id
         except Exception as e:
-            logger.exception(f"Error updating prompt '{prompt_id}'")
+            logger.exception(f"Error updating prompt '{prompt_id}'.", e)
             raise
 
     def remove_prompt(self, prompt_id: str) -> None:
         """Remove a prompt by its ID. Raises KeyError if not found."""
         try:
             del self.registry[prompt_id]
-        except KeyError:
-            logger.exception(f"Error removing prompt '{prompt_id}'")
+        except KeyError as e:
+            logger.exception(f"Error removing prompt '{prompt_id}'.", e)
             raise
 
     def list_prompts(self):
@@ -83,5 +83,5 @@ class InMemoryPromptRepository(PromptRegistryInterface):
                 }
             return self._registry
         except Exception as e:
-            logger.exception("Error compiling prompt registry")
+            logger.exception("Error compiling prompt registry.", e)
             raise

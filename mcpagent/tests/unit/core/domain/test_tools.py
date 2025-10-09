@@ -1,4 +1,3 @@
-import pytest
 from mcpagent.core.domain.entities import Tool
 from mcpagent.core.domain.value_objects import ToolCard
 from mcpagent.core.domain.interfaces import ToolRegistryInterface

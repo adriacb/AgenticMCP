@@ -54,6 +54,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_json()
             messages = [HumanMessage(content=msg) for msg in data.get("messages", [])]
+            return messages
             # async for event in stream_response(messages):
             #     await websocket.send_json(event)
     except Exception as e:

@@ -1,4 +1,4 @@
-from core.domain.entities import Agent, InMemoryToolRegistry
+from core.domain.entities import Agent
 from core.domain.entities.prompt_repository import InMemoryPromptRepository
 from core.domain.value_objects import AgentConfig, AgentCard, LLMConfig
 from core.domain.interfaces import ToolRegistryInterface

@@ -11,10 +11,10 @@ async def stream_response(
     """
     Streams compiled LangGraph responses
     """
-    async for message_chunk, metadata in graph.astream(
+    async for message_chunk, _ in graph.astream( #metadata is not used
         state=state, 
         stream_mode=stream_mode,
         config = {"configurable": {"thread_id": thread_id, "callbacks": callbacks}}
     ):
         if message_chunk.content:
-            yield(message_chunk.content, end="|", flush=True)
+            yield(message_chunk.content)
