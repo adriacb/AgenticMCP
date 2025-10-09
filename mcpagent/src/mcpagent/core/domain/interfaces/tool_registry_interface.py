@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from .tool_interface import ToolInterface
 
+
 class ToolRegistryInterface(ABC):
     @abstractmethod
     def get(self, name: str) -> dict:

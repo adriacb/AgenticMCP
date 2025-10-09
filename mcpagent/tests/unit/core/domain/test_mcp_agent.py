@@ -50,7 +50,12 @@ def test_ainvoke_with_tool_call_executes_tool_and_returns_final_response():
             # first call returns a tool_call, second call returns final answer
             self._calls += 1
             if self._calls == 1:
-                return SimpleNamespace(content="", tool_calls=[{"name": "add", "args": {"a": 2, "b": 2}, "id": "call1"}])
+                return SimpleNamespace(
+                    content="",
+                    tool_calls=[
+                        {"name": "add", "args": {"a": 2, "b": 2}, "id": "call1"}
+                    ],
+                )
             return SimpleNamespace(content="The result of 2 + 2 is 4.", tool_calls=[])
 
     _patch_chatllm(mod, FakeChatLLM)
@@ -64,6 +69,7 @@ def test_ainvoke_with_tool_call_executes_tool_and_returns_final_response():
     from mcpagent.core.domain.value_objects.agent_config import AgentConfig
     from mcpagent.core.domain.value_objects.llm_config import LLMConfig
     from mcpagent.core.domain.value_objects.agent_card import AgentCard
+
     cfg = AgentConfig(llm_config=LLMConfig(model="dummy"), agent_card=AgentCard())
     session = FakeSession()
 

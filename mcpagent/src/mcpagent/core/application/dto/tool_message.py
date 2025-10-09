@@ -5,6 +5,7 @@ from typing import Any
 @dataclass
 class ToolMessage:
     """Framework-agnostic message representing a tool's response."""
+
     role: str
     tool_call_id: str
     name: str

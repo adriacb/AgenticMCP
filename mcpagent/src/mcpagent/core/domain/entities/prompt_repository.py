@@ -2,7 +2,11 @@ from typing import Optional, Dict
 
 from mcpagent.infrastructure.logger import LoggerInitializer
 from mcpagent.core.domain.interfaces import PromptRegistryInterface
-from mcpagent.core.domain.entities.prompts import REACT_PROMPT, RETRIEVAL_QA_CHAT_PROMPT, REACT_JSON_PROMPT
+from mcpagent.core.domain.entities.prompts import (
+    REACT_PROMPT,
+    RETRIEVAL_QA_CHAT_PROMPT,
+    REACT_JSON_PROMPT,
+)
 
 logger = LoggerInitializer.get_default_logger()
 
@@ -58,7 +62,7 @@ class InMemoryPromptRepository(PromptRegistryInterface):
         except KeyError:
             logger.exception(f"Error removing prompt '{prompt_id}'")
             raise
-    
+
     def list_prompts(self):
         return f"Prompts: {list(self.registry.keys())}"
 
@@ -75,7 +79,7 @@ class InMemoryPromptRepository(PromptRegistryInterface):
                     "default": "You are a helpful assistant.",
                     "react": REACT_PROMPT,
                     "retrieval_qa": RETRIEVAL_QA_CHAT_PROMPT,
-                    "react_json": REACT_JSON_PROMPT
+                    "react_json": REACT_JSON_PROMPT,
                 }
             return self._registry
         except Exception as e:

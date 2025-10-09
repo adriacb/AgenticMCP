@@ -48,14 +48,18 @@ def load_settings(env: str | None = None) -> SimpleNamespace:
     env_name = _choose_env_name(env)
     # temporary logger to capture loader messages (will be reconfigured after env file is loaded)
     temp_level = "DEBUG" if env_name in ("dev", "development") else "INFO"
-    logger = LoggerInitializer.initialize(LoggerConfig(level=temp_level, json_format=False))
+    logger = LoggerInitializer.initialize(
+        LoggerConfig(level=temp_level, json_format=False)
+    )
     env_file = _find_env_file(env_name)
 
     if env_file:
         load_dotenv(env_file, override=True)
         logger.debug("Loading env file: %s", env_file)
     else:
-        logger.debug("No env file found for env=%s; using process environment", env_name)
+        logger.debug(
+            "No env file found for env=%s; using process environment", env_name
+        )
 
     # Instantiate config models; be tolerant if required values are missing
     fastapi_conf = None
@@ -63,11 +67,23 @@ def load_settings(env: str | None = None) -> SimpleNamespace:
 
     # Reconfigure global logger based on LOG_LEVEL from env file (or sensible defaults per profile)
     # If .env set LOG_LEVEL it will now be in os.environ because we loaded env_file above.
-    final_level = (os.environ.get("LOG_LEVEL") or ("DEBUG" if env_name == "dev" else "WARNING")).upper()
-    logger = LoggerInitializer.initialize(LoggerConfig(level=final_level, json_format=False))
+    final_level = (
+        os.environ.get("LOG_LEVEL") or ("DEBUG" if env_name == "dev" else "WARNING")
+    ).upper()
+    # Avoid caching bound logger wrappers so reconfiguration in this loader
+    # propagates to other modules that request loggers after settings are loaded.
+    logger = LoggerInitializer.initialize(
+        LoggerConfig(
+            level=final_level, json_format=False, cache_logger_on_first_use=False
+        )
+    )
 
     try:
-        fastapi_conf = FastAPIConfigModel.from_env_file(env_file) if env_file else FastAPIConfigModel()
+        fastapi_conf = (
+            FastAPIConfigModel.from_env_file(env_file)
+            if env_file
+            else FastAPIConfigModel()
+        )
     except Exception as ex:  # pragma: no cover - defensive for missing optional values
         logger.warning("Failed to build FastAPIConfigModel: %s", ex)
         try:
@@ -76,8 +92,12 @@ def load_settings(env: str | None = None) -> SimpleNamespace:
             fastapi_conf = None
 
     try:
-        langfuse_conf = LangfuseConfigModel.from_env_file(env_file) if env_file else None
-    except Exception as ex:  # pragma: no cover - Langfuse may require secrets in prod only
+        langfuse_conf = (
+            LangfuseConfigModel.from_env_file(env_file) if env_file else None
+        )
+    except (
+        Exception
+    ) as ex:  # pragma: no cover - Langfuse may require secrets in prod only
         logger.warning("Failed to build LangfuseConfigModel: %s", ex)
         langfuse_conf = None
 

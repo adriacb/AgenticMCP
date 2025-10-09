@@ -193,7 +193,6 @@ class MongoClientWrapper(Generic[T]):
 
         return parsed_documents
 
-
     def get_collection_count(self) -> int:
         """Count the total number of documents in the collection.
 
@@ -249,19 +248,19 @@ class MongoIndex:
 
 
 async def get_mongodb_checkpointer(
-        connection_string: str,
-        database_name: str,
-        collection_name: str,
-        write_collection_name: str,
-        ) -> AsyncMongoDBSaver:
+    connection_string: str,
+    database_name: str,
+    collection_name: str,
+    write_collection_name: str,
+) -> AsyncMongoDBSaver:
     """Get a MongoDB checkpointer.
-    
+
     Args:
         connection_string: The connection string for the MongoDB instance.
         database_name: The name of the database to use.
         collection_name: The name of the collection to use.
         write_collection_name: The name of the collection to use for writing.
-    
+
     Returns:
         A MongoDB checkpointer.
     """
@@ -271,7 +270,7 @@ async def get_mongodb_checkpointer(
             database_name=database_name,
             collection_name=collection_name,
             write_collection_name=write_collection_name,
-            )
+        )
     except Exception as e:
         logger.error(f"Error getting MongoDB checkpointer: {e}")
         raise e

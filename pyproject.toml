@@ -13,11 +13,15 @@ dependencies = [
     "lab>=8.4",
     "langchain>=0.3.27",
     "langchain-openai>=0.3.30",
+    "langgraph>=0.4.8",
+    "langgraph-cli[inmem]>=0.4.2",
     "mcp[cli]>=1.9.4",
     "pydantic-settings>=2.9.1",
     "pytest>=8.4.0",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=6.3.0",
+    "python-a2a>=0.5.10",
+    "ruff>=0.12.12",
     "structlog>=25.4.0",
 ]
 

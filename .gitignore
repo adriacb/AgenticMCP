@@ -27,3 +27,9 @@ uv.lock
 
 notebooks/
 mcpagent/config/
+
+coverage_html/
+coverage.xml
+.coverage
+*.log
+.langgraph_api/

@@ -5,12 +5,14 @@ from typing import List, Any
 from langchain_core.messages import HumanMessage
 
 
-#from mcpagent.application.use_cases.langgraph import stream_response
+# from mcpagent.application.use_cases.langgraph import stream_response
 
 router = APIRouter()
 
+
 def register_routes(app: FastAPI):
     app.include_router(router)
+
 
 class MessageRequest(BaseModel):
     user_id: str
@@ -20,10 +22,10 @@ class MessageRequest(BaseModel):
 @router.post("/generate/stream")
 async def generate_stream_endpoint(request: MessageRequest):
     """Generate a response with streaming.
-    
+
     Args:
         request: The request to generate a response for.
-    
+
     Returns:
         A streaming response.
     """
@@ -34,18 +36,19 @@ async def generate_stream_endpoint(request: MessageRequest):
             #     query=request.messages,
             #     thread_id=request.user_id,
             #     callbacks=[router.app.state.langfuse_handler],
-            #     ), 
+            #     ),
             # headers={"Content-Type": "text/event-stream"},
             # media_type="text/event-stream",
-            )
+        )
     except Exception as e:
         app.state.logger.error(f"Error generating stream response: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for streaming responses."""
-    
+
     await websocket.accept()
     try:
         while True:

@@ -1,9 +1,9 @@
 {
     "dockerfile_lines": [],
     "graphs": {
-      "agent": ".graph.py:graph"
+      "agent": "mcpagent.presentation.langgraph.agents.react_agent.init_react_agent_mcp:react_graph"
     },
-    "env": "config/.env",
+    "env": "C:\\Users\\cabe\\Documents\\repos\\agentic_summits\\AgenticMCP\\mcpagent\\config\\.env.dev",
     "python_version": "3.12",
     "dependencies": [
       "."

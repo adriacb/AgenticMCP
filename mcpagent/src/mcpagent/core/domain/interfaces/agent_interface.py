@@ -2,6 +2,7 @@ from typing import List
 from abc import ABC, abstractmethod
 from .message_interface import BaseMessage
 
+
 class AgentInterface(ABC):
     @abstractmethod
     def invoke(self, input: List[BaseMessage]) -> str:

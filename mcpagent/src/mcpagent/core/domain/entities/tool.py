@@ -49,7 +49,7 @@ class Tool(ToolInterface):
                 "name": self.name,
                 "description": self.description,
                 "parameters": schema,
-                "strict": True,   # 👈 force strict mode here
+                "strict": True,  # 👈 force strict mode here
             },
         }
 
@@ -89,11 +89,11 @@ class Tool(ToolInterface):
         tool_card = ToolCard(
             name=name or func.__name__,
             description=description or (func.__doc__ or ""),
-            tags=tags or [],        # 👈 enforce list
-            examples=examples or [],# 👈 enforce list
+            tags=tags or [],  # 👈 enforce list
+            examples=examples or [],  # 👈 enforce list
             parameters=args_schema.model_json_schema(),
             function=func,
             args_schema=args_schema,
-            strict=True,   # 👈 force strict mode
+            strict=True,  # 👈 force strict mode
         )
         return cls(tool_card)

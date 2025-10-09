@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from mcpagent.core.application.use_cases import ChatAgentUseCase
 
+
 @pytest.mark.asyncio
 async def test_chat_agent_usecase_success(monkeypatch):
     # Dummy Agent implementation used to patch the real Agent dependency
@@ -20,7 +21,9 @@ async def test_chat_agent_usecase_success(monkeypatch):
         DummyAgent,
     )
 
-    usecase = ChatAgentUseCase(config=SimpleNamespace(), tool_registry=SimpleNamespace())
+    usecase = ChatAgentUseCase(
+        config=SimpleNamespace(), tool_registry=SimpleNamespace()
+    )
     input_obj = SimpleNamespace(query="Hello", tools=None, context=None)
 
     output = await usecase(input_obj)
@@ -29,11 +32,13 @@ async def test_chat_agent_usecase_success(monkeypatch):
     assert output.response == "mocked-response"
     assert getattr(output, "metadata", {}).get("source") == "ChatAgent"
 
+
 @pytest.mark.asyncio
 async def test_chat_agent_usecase_empty_query_raises(monkeypatch):
     class DummyAgent:
         def __init__(self, config, tool_registry):
             pass
+
         async def invoke(self, query, tools=None, context=None):
             return "should-not-be-returned"
 
@@ -42,7 +47,9 @@ async def test_chat_agent_usecase_empty_query_raises(monkeypatch):
         DummyAgent,
     )
 
-    usecase = ChatAgentUseCase(config=SimpleNamespace(), tool_registry=SimpleNamespace())
+    usecase = ChatAgentUseCase(
+        config=SimpleNamespace(), tool_registry=SimpleNamespace()
+    )
     input_obj = SimpleNamespace(query="", tools=None, context=None)
 
     with pytest.raises(ValueError):

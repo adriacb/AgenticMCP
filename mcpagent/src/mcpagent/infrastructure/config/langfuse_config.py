@@ -2,8 +2,10 @@ from typing import Optional, List
 from pydantic import Field, field_validator
 from .base import BaseConfigModel
 
+
 class LangfuseConfigModel(BaseConfigModel):
     """Pydantic model for Langfuse configuration."""
+
     public_key: str = Field(..., alias="LANGFUSE_PUBLIC_KEY")
     secret_key: str = Field(..., alias="LANGFUSE_SECRET_KEY")
     host: str = Field(default="https://cloud.langfuse.com", alias="LANGFUSE_HOST")
@@ -13,8 +15,8 @@ class LangfuseConfigModel(BaseConfigModel):
     release: str = Field(default="development", alias="LANGFUSE_RELEASE")
     environment: str = Field(default="development", alias="LANGFUSE_ENVIRONMENT")
 
-    @field_validator('tags', mode='before')
+    @field_validator("tags", mode="before")
     def split_tags(cls, v):
         if isinstance(v, str):
-            return [tag.strip() for tag in v.split(',') if tag.strip()]
+            return [tag.strip() for tag in v.split(",") if tag.strip()]
         return v

@@ -13,6 +13,7 @@ from mcpagent.infrastructure.logger import LoggerInitializer
 # from mcpagent.application.services.config.langfuse_config import LangfuseConfig
 # from mcpagent.infrastructure.memory import InMemorySaver
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # checkpointer = await get_mongodb_checkpointer(
@@ -22,9 +23,9 @@ async def lifespan(app: FastAPI):
     #     write_collection_name="checkpoints",
     #     )
     app.state.logger = LoggerInitializer.get_default_logger()
-    #checkpointer = InMemorySaver()
+    # checkpointer = InMemorySaver()
     app.state.logger.info("Building LangGraph at startup...")
-    yield   # 👈 this was missing!
+    yield  # 👈 this was missing!
     # app.state.graph = build_graph(checkpointer=checkpointer)  # or await if async
     # logger.info("LangGraph initialized.")
     # logger.info(f"Langfuse handler: {app.state.langfuse_handler}")
@@ -34,11 +35,8 @@ async def lifespan(app: FastAPI):
     # logger.info("Shutting down...")  # optional cleanup
 
 
-app = FastAPI(
-    title="LangGraph API", 
-    lifespan=lifespan
-    )
+app = FastAPI(title="LangGraph API", lifespan=lifespan)
 
 add_middleware(app)
 add_exception_handlers(app)
-register_routes(app) 
+register_routes(app)

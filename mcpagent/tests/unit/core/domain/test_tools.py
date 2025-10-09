@@ -3,6 +3,7 @@ from mcpagent.core.domain.entities import Tool
 from mcpagent.core.domain.value_objects import ToolCard
 from mcpagent.core.domain.interfaces import ToolRegistryInterface
 
+
 def test_tool_execute_calls_function_with_args_and_kwargs():
     called = {}
 
@@ -27,11 +28,15 @@ def test_tool_execute_calls_function_with_args_and_kwargs():
     assert called["args"] == (1, 2)
     assert called["kwargs"] == {"x": 3}
 
+
 def test_tool_repr_contains_name():
-    def noop(): pass
+    def noop():
+        pass
+
     card = ToolCard(name="mytool", description="d", parameters={}, function=noop)
     tool = Tool(tool_card=card)
     assert "mytool" in repr(tool)
+
 
 def test_inmemory_tool_registry_add_get_remove_list():
     class InMemoryToolRegistry(ToolRegistryInterface):

@@ -9,6 +9,7 @@ def agent_to_node(agent):
         response = agent.invoke(state["messages"])
         state["messages"].append({"role": "assistant", "content": response})
         return state
+
     return node
 
 

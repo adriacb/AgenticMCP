@@ -14,5 +14,5 @@ __all__ = [
     "AIMessage",
     "InMemoryToolRegistry",
     "InMemoryPromptRepository",
-    "Tool"
+    "Tool",
 ]

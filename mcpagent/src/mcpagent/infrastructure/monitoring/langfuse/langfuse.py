@@ -1,9 +1,11 @@
 """Langfuse service for monitoring and tracing."""
+
 from typing import Optional
 from langfuse.callback import CallbackHandler
 from mcpagent.application.services.logger import LoggerInitializer
 
 logger = LoggerInitializer.get_default_logger()
+
 
 def create_langfuse_callback(config) -> Optional[CallbackHandler]:
     """Create a Langfuse callback handler with the given settings.
@@ -21,7 +23,7 @@ def create_langfuse_callback(config) -> Optional[CallbackHandler]:
             tags=config.langfuse_tags,
             version=config.langfuse_version,
             release=config.langfuse_release,
-            environment=config.langfuse_environment
+            environment=config.langfuse_environment,
         )
     except Exception as e:
         logger.error(f"Failed to create Langfuse client: {e}")

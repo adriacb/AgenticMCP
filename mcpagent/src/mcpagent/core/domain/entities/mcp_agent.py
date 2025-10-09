@@ -3,6 +3,7 @@ from mcpagent.core.domain.value_objects import AgentConfig
 from mcpagent.core.domain.interfaces import BaseMessage, AgentInterface
 from mcpagent.core.application.dto import ToolMessage
 from mcpagent.src.mcpagent.infrastructure import logger
+
 # We'll construct our framework-agnostic ToolMessage DTO for clarity, but
 # convert it to a plain dict with `to_dict()` before appending so LangChain
 # can coerce the message correctly.
@@ -41,7 +42,7 @@ class MCPAgent(AgentInterface):
         """Async factory to fetch and wrap tools from MCP server."""
         try:
             tools = await session.list_tools()
-            
+
         except Exception as e:
             cls.logger.error("Error fetching tools", extra={"error": e})
             tools = []
@@ -52,9 +53,7 @@ class MCPAgent(AgentInterface):
         tool_names = [tool.name for tool in self.tools]
 
         return self.config.system_prompt.format(
-            tools=jsonified_tools,
-            chat_history=messages,
-            input=messages[-1]["content"]
+            tools=tool_names, chat_history=messages, input=messages[-1]["content"]
         )
 
     async def ainvoke(self, input: List[BaseMessage], max_attempts: int = 8) -> str:
@@ -81,28 +80,39 @@ class MCPAgent(AgentInterface):
         attempts = 0
         # Loop while the LLM returns tool calls and we have attempts left
         while getattr(result, "tool_calls", None) and attempts < max_attempts:
-            self.logger.info("LLM requested tool calls; handling", extra={"attempt": attempts + 1})
+            self.logger.info(
+                "LLM requested tool calls; handling", extra={"attempt": attempts + 1}
+            )
             result = await self._handle_tool_calls(result, messages)
             self.logger.info("Result after handling tools", extra={"result": result})
             attempts += 1
 
         if getattr(result, "tool_calls", None):
             # max attempts reached and the LLM still wants to call tools.
-            self.logger.warning("Max attempts reached while resolving tool calls", extra={"attempts": attempts})
-            return getattr(result, "content", "Max attempts reached while resolving tool calls")
+            self.logger.warning(
+                "Max attempts reached while resolving tool calls",
+                extra={"attempts": attempts},
+            )
+            return getattr(
+                result, "content", "Max attempts reached while resolving tool calls"
+            )
 
         # No remaining tool calls — return final assistant content
         return getattr(result, "content", "")
 
     def invoke(self, input: List[BaseMessage]) -> str:
-        raise NotImplementedError("Synchronous invoke is not implemented. Use ainvoke instead.")
+        raise NotImplementedError(
+            "Synchronous invoke is not implemented. Use ainvoke instead."
+        )
 
-    async def _handle_tool_calls(self, result: AIMessage, messages: List[BaseMessage]) -> AIMessage:
+    async def _handle_tool_calls(
+        self, result: AIMessage, messages: List[BaseMessage]
+    ) -> AIMessage:
         tool_calls = getattr(result, "tool_calls", [])
         if not tool_calls:
             return result
 
-        self.logger.info("Handling tool calls", tool_calls=tool_calls)
+        self.logger.debug("Handling tool calls", tool_calls=tool_calls)
 
         messages.append(result)
 

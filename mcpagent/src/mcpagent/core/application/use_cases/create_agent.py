@@ -3,6 +3,7 @@ from core.domain.entities.prompt_repository import InMemoryPromptRepository
 from core.domain.value_objects import AgentConfig, AgentCard, LLMConfig
 from core.domain.interfaces import ToolRegistryInterface
 
+
 class CreateAgent:
     """Use case to create a generic Agent."""
 
@@ -11,7 +12,7 @@ class CreateAgent:
         llm_config: LLMConfig,
         agent_card: AgentCard,
         prompt_repository: InMemoryPromptRepository,
-        tool_registry: ToolRegistryInterface | None = None
+        tool_registry: ToolRegistryInterface | None = None,
     ) -> Agent:
         """
         Create and return an Agent instance.

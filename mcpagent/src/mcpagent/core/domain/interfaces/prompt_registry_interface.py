@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class PromptRegistryInterface(ABC):
     @abstractmethod
     def get_prompt(self, prompt_id: str) -> str:

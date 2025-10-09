@@ -6,6 +6,7 @@ from .tool import Tool
 from typing import Dict, Optional
 from langchain_core.utils.function_calling import convert_to_openai_tool
 
+
 def infer_args_schema(func) -> type[BaseModel]:
     """
     Create a Pydantic model automatically from a Python function signature.
@@ -16,13 +17,8 @@ def infer_args_schema(func) -> type[BaseModel]:
         annotation = param.annotation if param.annotation != param.empty else str
         default = param.default if param.default != param.empty else ...
         fields[name] = (annotation, Field(default=default))
-    model = create_model(
-        f"{func.__name__.title()}Args",
-        __base__=BaseModel,
-        **fields
-    )
+    model = create_model(f"{func.__name__.title()}Args", __base__=BaseModel, **fields)
     return model
-
 
 
 class InMemoryToolRegistry(ToolRegistryInterface):
@@ -57,7 +53,9 @@ class InMemoryToolRegistry(ToolRegistryInterface):
 
         for t in self._tools.values():
             # --- Build JSON Schema for parameters from Pydantic v2 model ---
-            if t.args_schema is not None and hasattr(t.args_schema, "model_json_schema"):
+            if t.args_schema is not None and hasattr(
+                t.args_schema, "model_json_schema"
+            ):
                 params = t.args_schema.model_json_schema()
                 # Normalize root to object schema
                 if params.get("type") != "object":
@@ -67,7 +65,8 @@ class InMemoryToolRegistry(ToolRegistryInterface):
                 # Compute `required` from model fields if missing
                 if "required" not in params:
                     required = [
-                        name for name, field in t.args_schema.model_fields.items()
+                        name
+                        for name, field in t.args_schema.model_fields.items()
                         if field.is_required()
                     ]
                     if required:

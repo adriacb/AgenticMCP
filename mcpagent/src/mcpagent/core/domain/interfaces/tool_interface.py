@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class ToolInterface(ABC):
     """
     Abstract base class for tools that can be used by the agent.

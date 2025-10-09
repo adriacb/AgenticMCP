@@ -25,6 +25,10 @@ class ChatAgentUseCase:
         # Agent symbol is patched in tests; use it if present.
         Agent = globals().get("Agent")
         agent = Agent(self.config, self.tool_registry)
-        response = await agent.invoke(query, tools=getattr(input_obj, "tools", None), context=getattr(input_obj, "context", None))
+        response = await agent.invoke(
+            query,
+            tools=getattr(input_obj, "tools", None),
+            context=getattr(input_obj, "context", None),
+        )
 
         return SimpleNamespace(response=response, metadata={"source": "ChatAgent"})

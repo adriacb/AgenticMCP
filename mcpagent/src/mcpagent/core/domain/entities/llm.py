@@ -5,7 +5,8 @@ from mcpagent.core.domain.interfaces import LLMInterface, BaseMessage
 from mcpagent.core.domain.value_objects import LLMConfig
 from mcpagent.infrastructure.logger import LoggerInitializer
 from .messages import AIMessage
-#from .tool import Tool
+
+# from .tool import Tool
 from mcp.server.fastmcp.tools.base import Tool
 
 
@@ -59,7 +60,9 @@ class ChatLLM(LLMInterface):
             "ChatLLM initialized",
             extra={
                 "llm_config": self.llm_config,
-                "tools": [getattr(t, "name", None) for t in self.tools] if self.tools else [],
+                "tools": [getattr(t, "name", None) for t in self.tools]
+                if self.tools
+                else [],
             },
         )
 
@@ -97,7 +100,6 @@ class ChatLLM(LLMInterface):
         """
         return await self.llm.ainvoke(messages)
 
-
     def generate(self, prompt: str) -> str:
         """
         Synchronous text generation using the LLM.
@@ -108,7 +110,10 @@ class ChatLLM(LLMInterface):
         Returns:
             Generated text.
         """
-        self.logger.debug("ChatLLM generate called", extra={"prompt": prompt[:round(len(prompt) * 0.1)]})
+        self.logger.debug(
+            "ChatLLM generate called",
+            extra={"prompt": prompt[: round(len(prompt) * 0.1)]},
+        )
         return self.llm.generate(prompt)
 
     async def agenerate(self, prompt: str) -> str:
@@ -121,5 +126,8 @@ class ChatLLM(LLMInterface):
         Returns:
             Generated text.
         """
-        self.logger.debug("ChatLLM agenerate called", extra={"prompt": prompt[:round(len(prompt) * 0.1)]})
+        self.logger.debug(
+            "ChatLLM agenerate called",
+            extra={"prompt": prompt[: round(len(prompt) * 0.1)]},
+        )
         return await self.llm.agenerate(prompt)

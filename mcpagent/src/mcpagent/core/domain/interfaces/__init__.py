@@ -12,5 +12,5 @@ __all__ = [
     "ToolRegistryInterface",
     "LLMInterface",
     "BaseMessage",
-    "PromptRegistryInterface"
+    "PromptRegistryInterface",
 ]

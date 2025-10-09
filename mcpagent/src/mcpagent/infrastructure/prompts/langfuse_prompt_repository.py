@@ -27,22 +27,22 @@ class LangfusePromptRepository(PromptRegistryInterface):
         except Exception as e:
             logger.error(f"Error getting prompt: {e}")
             raise e
-    
+
     def create_prompt(self, prompt: str) -> str:
         try:
             return self.langfuse.create_prompt(prompt)
         except Exception as e:
             logger.error(f"Error creating prompt: {e}")
             raise e
-    
+
     def update_prompt(self, prompt_id: str, prompt: str) -> str:
         """Update a prompt in Langfuse.
-        
+
         Note: Langfuse does not support updating prompts directly.
         This method is implemented to satisfy the interface but will raise NotImplementedError.
         """
         raise NotImplementedError("Langfuse does not support updating prompts directly")
-    
+
     def compile(self, **kwargs) -> str:
         try:
             return self.langfuse.compile(**kwargs)

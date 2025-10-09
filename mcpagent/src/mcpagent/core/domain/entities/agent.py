@@ -71,7 +71,9 @@ class Agent:
             tool_args = call.get("args", {}) or {}
             tool_call_id = call["id"]
 
-            logger.debug("Executing local tool", extra={"tool": tool_name, "args": tool_args})
+            logger.debug(
+                "Executing local tool", extra={"tool": tool_name, "args": tool_args}
+            )
 
             tool = self.tool_registry.get(tool_name)
             if not tool:
