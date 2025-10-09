@@ -9,16 +9,12 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.12",
-    "fastmcp[cli]>=2.12.4",
-    "langchain>=0.3.27",
     "langfuse>=3.0.1",
     "langgraph>=0.4.8",
     "mcp[cli]>=1.9.3",
     "openai>=1.86.0",
     "pytest>=8.4.2",
-    "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
-    "structlog>=25.4.0",
     "websockets>=15.0.1",
 ]
 
