@@ -32,7 +32,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          uv run pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
+          PYTHONPATH=$(pwd) uv run pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
