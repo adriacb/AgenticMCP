@@ -24,6 +24,7 @@ jobs:
 
       # ✅ Point uv to the correct pyproject.toml in mcpagent/
       - name: Sync dependencies from pyproject.toml
+        working-directory: mcpagent
         run: uv sync --project mcpagent
 
       # ✅ Install the project (editable mode) using src layout
@@ -36,8 +37,6 @@ jobs:
       # ✅ Add src to PYTHONPATH for pytest
       - name: Run tests with coverage
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)/mcpagent/src
-          cd mcpagent
           uv run pytest -q --maxfail=1 --cov=mcpagent --cov-report=xml:coverage.xml
 
       - name: Upload coverage artifact

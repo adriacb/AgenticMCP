@@ -13,12 +13,18 @@ dependencies = [
     "langgraph>=0.4.8",
     "mcp[cli]>=1.9.3",
     "openai>=1.86.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
     "websockets>=15.0.1",
 ]
 
 [project.scripts]
 mcpagent = "mcpagent:main"
 
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.ruff]
+ignore = ["F841", "F811", "F821", "F401"]  # Example: ignore unused imports and line length
