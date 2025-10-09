@@ -33,7 +33,7 @@ jobs:
         working-directory: mcpagent
 
       - name: Lint with ruff
-        run: uv run ruff check mcpagent
+        run: uv run ruff check src
         working-directory: mcpagent
 
       # ✅ Add src to PYTHONPATH for pytest
