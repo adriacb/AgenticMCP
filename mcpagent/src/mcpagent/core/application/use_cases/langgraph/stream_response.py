@@ -1,20 +1,31 @@
 from typing import List, AsyncGenerator, Literal
 from langgraph.graph import StateGraph
+from pydantic import BaseModel
+
+class State(BaseModel):
+    messages: List[dict]
+    metadata: dict
 
 async def stream_response(
-        graph: StateGraph, 
+        graph: StateGraph,
         state: State,
         stream_mode: Literal["updates", "messages", "custom"] = "messages",
         thread_id: str = "",
         callbacks: List[callable] = []
     ) -> AsyncGenerator[dict, None]:
     """
-    Streams compiled LangGraph responses
+    Streams compiled LangGraph responses asynchronously.
+    
+    Args:
+        graph: The compiled StateGraph.
+        state: The input state for the graph.
+        stream_mode: Type of streaming ("updates", "messages", "custom").
+        thread_id: Optional thread identifier.
+        callbacks: Optional callbacks for streaming events.
+
+    Yields:
+        dict: Each chunk of the response content.
     """
-    async for message_chunk, _ in graph.astream( #metadata is not used
-        state=state, 
-        stream_mode=stream_mode,
-        config = {"configurable": {"thread_id": thread_id, "callbacks": callbacks}}
-    ):
-        if message_chunk.content:
-            yield(message_chunk.content)
+    # astream returns an async generator, so we must async for it
+    async for chunk in graph.graph.astream(state):
+        yield chunk

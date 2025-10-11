@@ -1,42 +1,41 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+import asyncio
+import os
 
+### API
+from mcpagent.presentation.api.router import router
 from mcpagent.presentation.api.middleware import add_middleware
-from mcpagent.presentation.api.routes import register_routes
 from mcpagent.presentation.api.error_handling import add_exception_handlers
-
-from mcpagent.infrastructure.logger import LoggerInitializer
-
-# from mcpagent.application.use_cases.langgraph import build_graph
-# from mcpagent.application.services.logger import LoggerInitializer
-# from mcpagent.application.services.monitoring.langfuse import get_langfuse_callback
-# from mcpagent.application.services.config.langfuse_config import LangfuseConfig
-# from mcpagent.infrastructure.memory import InMemorySaver
+### Presentations
+from mcpagent.infrastructure.events import consume_events
+from .lifespan import init_event_queue, init_callbacks, init_logger, init_graph
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # checkpointer = await get_mongodb_checkpointer(
-    #     connection_string=settings.MONGO_URI,
-    #     database_name=settings.MONGO_DB_NAME,
-    #     collection_name="checkpoints",
-    #     write_collection_name="checkpoints",
-    #     )
-    app.state.logger = LoggerInitializer.get_default_logger()
-    # checkpointer = InMemorySaver()
-    app.state.logger.info("Building LangGraph at startup...")
-    yield  # 👈 this was missing!
-    # app.state.graph = build_graph(checkpointer=checkpointer)  # or await if async
-    # logger.info("LangGraph initialized.")
-    # logger.info(f"Langfuse handler: {app.state.langfuse_handler}")
-    # app.state.langfuse_handler = get_langfuse_callback(settings)
-    # logger.info(f"Langfuse initialized.")
-    # yield
-    # logger.info("Shutting down...")  # optional cleanup
+    await init_logger(app)
+    await init_event_queue(app)
+    await init_graph(app) # this should accept the checkpointer later
+    await init_callbacks(app)
+
+    asyncio.create_task(consume_events(
+        event_queue=app.state.event_queue,
+        graph=app.state.graph,
+        callbacks=app.state.callbacks,
+        logger=app.state.logger,
+        ))
+    app.state.logger.info("Event consumer started.")
+    yield  # ENSURE THIS IS LAST!
+    # On shutdown (Kafka only)
+    if hasattr(app.state.event_queue, "stop"):
+        await app.state.event_queue.stop()
 
 
 app = FastAPI(title="LangGraph API", lifespan=lifespan)
 
 add_middleware(app)
 add_exception_handlers(app)
-register_routes(app)
+app.include_router(router)
+
+

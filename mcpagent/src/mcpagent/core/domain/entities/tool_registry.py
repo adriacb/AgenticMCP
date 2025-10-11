@@ -41,6 +41,9 @@ class InMemoryToolRegistry(ToolRegistryInterface):
         else:
             raise ValueError(f"Tool with name {name} does not exist.")
 
+    def get_all_functions(self) -> list:
+        return [x.function for x in self._tools.values()]
+
     def list(self) -> list:
         """
         Return tools in **OpenAI tool dict** format, with:
